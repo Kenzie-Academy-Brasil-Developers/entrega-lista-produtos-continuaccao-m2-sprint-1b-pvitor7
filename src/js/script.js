@@ -1,9 +1,5 @@
 // Selecionando elemento ul do HTML
 const ul = document.querySelector('.containerListaProdutos ul');
-let buttonItem;
-
-let somaPreco = document.querySelector("#precoTotal");
-somaPrecoCarrinho = 0;
 
 function montarListaProdutos(listaProdutos){
 
@@ -11,6 +7,7 @@ function montarListaProdutos(listaProdutos){
 
     listaProdutos.forEach((produto) => {
         const li = document.createElement('li');
+        li.dataset.id = produto.id;
         const img = document.createElement('img');
         const h3 = document.createElement('h3');
         const p = document.createElement('p');
@@ -21,7 +18,7 @@ function montarListaProdutos(listaProdutos){
         const componenteDois = document.createElement('li')
         const componenteTres = document.createElement('li')
         const componenteQuatro = document.createElement('li')
-        buttonItem = document.createElement('button')
+        let buttonItem = document.createElement('button')
         buttonItem.id = "compraritem"
 
         // Adicionando dados do produto aos elementos
@@ -33,7 +30,6 @@ function montarListaProdutos(listaProdutos){
         componenteUm.innerText = produto.componentes[0]
         componenteDois.innerText = produto.componentes[1]
         componenteTres.innerText = produto.componentes[2]
-     
         componenteQuatro.innerText = produto.componentes[3]
         buttonItem.innerText = 'Adicionar ao carrinho'
 
@@ -46,7 +42,7 @@ function montarListaProdutos(listaProdutos){
         nutrientes.appendChild(componenteUm);
         nutrientes.appendChild(componenteDois);
         nutrientes.appendChild(componenteTres);
-        //Se não houver um 4º componente em nutrientes, não adiciona
+        //Se não houver um 4º componente em nutrientes, não o adiciona
         if(produto.componentes.length > 3){
             nutrientes.appendChild(componenteQuatro);}
 
@@ -57,13 +53,13 @@ function montarListaProdutos(listaProdutos){
     });
 }
 
-listaToda ()
-
 //Adicionando Mostrar todos os itens da lista
 const botaoMonstrarTodos = document.querySelector('#mostrarTodos');
 botaoMonstrarTodos.addEventListener('click', listaToda)
 
 //Função para exibir lista completa
+listaToda ()
+
 function listaToda (){
     
     const listaCompleta =  produtos;
@@ -73,23 +69,19 @@ function listaToda (){
 // Selecionando botao em nosso HTML
 const botaoMostrarHortifruti = document.querySelector('.estiloGeralBotoes--filtrarHortifruti');
 
-// Adicionando event listener de clique, e executando a função de filtro
-botaoMostrarHortifruti.addEventListener('click', filtrarPorHortifruti);
-
 //Filtro seção Hortifruti
 function filtrarPorHortifruti() {
 
-    somaPreco.innerText = ''
-   
     const listaHortifruti = produtos.filter((produto) => {
         return produto.secao === 'Hortifruti';
     });
-
     montarListaProdutos(listaHortifruti);
 }
+// Adicionando event listener de clique, e executando a função de filtro
+botaoMostrarHortifruti.addEventListener('click', filtrarPorHortifruti);
 
 //Adicionando evento a botão de busca por nome
-let buttonBuscaPorNome = document.getElementById("botaoNome")
+const buttonBuscaPorNome = document.getElementById("botaoNome")
 buttonBuscaPorNome.addEventListener('click', nameFilter);
 
 //Função de busca por nome
@@ -99,19 +91,15 @@ function nameFilter() {
     caixaBuscaPorNome = caixaBuscaPorNome.toLowerCase()
        
     let listaPorNome = produtos.filter((produto) => {
-     
          if(produto.nome.toLowerCase() == caixaBuscaPorNome){
-
-           return produto
-         }
+            return produto;
+            }
         if(produto.secao.toLowerCase() == caixaBuscaPorNome){
-
-            return produto
-         }
+            return produto;
+            }
         if(produto.categoria.toLowerCase() == caixaBuscaPorNome){
-
-            return produto
-         }
+            return produto;
+            }
     })
     montarListaProdutos(listaPorNome);
 }
@@ -121,22 +109,28 @@ const carrinhoDeCompras = document.querySelector("#listaNoCarrinho");
 ul.addEventListener('click', colocandoNoCarrinho);
 
 let precoTotalCarinnho = document.querySelector("#precoTotalCarinnho")
-let produtoSelecionado;
+let somaPreco = 0;
+
+let somaPrecoCarrinho = document.querySelector("#precoTotal");
+somaPrecoCarrinho = 0;
+let carrinhoArray = [];
 
 function colocandoNoCarrinho(event){
 
-    produtoSelecionado = event.target;
+    let selecaoProduto = event.target;
+    let selecaoProdutoPai = selecaoProduto.closest('li')
     
-    produtoSelecionado = produtoSelecionado.closest('li')
-    somaPreco = produtoSelecionado.children[2];
-    somaPreco = somaPreco.children[0];
-    somaPreco = somaPreco.children[0];
-    somaPreco = somaPreco.textContent;
-    somaPreco = somaPreco.replace(/[^1-9]/gi, '');   
-    somaPreco = Number(somaPreco)
-    somaPrecoCarrinho += somaPreco;
+    if(selecaoProduto.tagName === "BUTTON"){
+        let idProduto = selecaoProdutoPai.dataset.id;
+
+        for(let i = 0; i < produtos.length; i++){
+            if(produtos[i].id == idProduto){
+                somaPrecoCarrinho += Number(produtos[i].preco);
+                carrinhoArray.push(produtos[i])
+                }
+            }
+        }
+    let cloneProduto = selecaoProdutoPai.cloneNode(true);
     precoTotalCarinnho.innerText = `Preço total: R$ ${somaPrecoCarrinho},00`
-    
-    produtoSelecionado = produtoSelecionado.cloneNode(true);
-    carrinhoDeCompras.appendChild(produtoSelecionado);
+    carrinhoDeCompras.appendChild(cloneProduto);
 }
